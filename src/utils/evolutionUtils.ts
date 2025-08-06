@@ -13,22 +13,22 @@ export interface EvolutionPokemon {
   trade?: boolean;
 }
 
-export const STONE_NAMES: { [key: string]: string } = {
-  'fire-stone': '불꽃의돌',
-  'water-stone': '물의돌',
-  'thunder-stone': '번개의돌',
-  'leaf-stone': '잎의돌',
-  'moon-stone': '달의돌',
-  'sun-stone': '태양의돌',
-  'shiny-stone': '빛의돌',
-  'dusk-stone': '어둠의돌',
-  'dawn-stone': '각성의돌',
-  'ice-stone': '얼음의돌'
+export const STONE_NAMES: { [key: string]: { ko: string; en: string; ja: string } } = {
+  'fire-stone': { ko: '불꽃의돌', en: 'Fire Stone', ja: 'かえんのいし' },
+  'water-stone': { ko: '물의돌', en: 'Water Stone', ja: 'みずのいし' },
+  'thunder-stone': { ko: '번개의돌', en: 'Thunder Stone', ja: 'かみなりのいし' },
+  'leaf-stone': { ko: '잎의돌', en: 'Leaf Stone', ja: 'リーフのいし' },
+  'moon-stone': { ko: '달의돌', en: 'Moon Stone', ja: 'つきのいし' },
+  'sun-stone': { ko: '태양의돌', en: 'Sun Stone', ja: 'たいようのいし' },
+  'shiny-stone': { ko: '빛의돌', en: 'Shiny Stone', ja: 'ひかりのいし' },
+  'dusk-stone': { ko: '어둠의돌', en: 'Dusk Stone', ja: 'やみのいし' },
+  'dawn-stone': { ko: '각성의돌', en: 'Dawn Stone', ja: 'めざめのいし' },
+  'ice-stone': { ko: '얼음의돌', en: 'Ice Stone', ja: 'こおりのいし' }
 };
 
-export const TIME_NAMES: { [key: string]: string } = {
-  'day': '낮 시간',
-  'night': '밤 시간'
+export const TIME_NAMES: { [key: string]: { ko: string; en: string; ja: string } } = {
+  'day': { ko: '낮 시간', en: 'Day', ja: '昼' },
+  'night': { ko: '밤 시간', en: 'Night', ja: '夜' }
 };
 
 export const getPokemonIdFromUrl = (url: string): string => {
@@ -36,7 +36,7 @@ export const getPokemonIdFromUrl = (url: string): string => {
   return match ? match[1] : '1';
 };
 
-export const getEvolutionCondition = (evolutionDetails: any[]): string => {
+export const getEvolutionCondition = (evolutionDetails: any[], language: Language = 'en'): string => {
   if (!evolutionDetails || evolutionDetails.length === 0) {
     return '';
   }
@@ -45,42 +45,50 @@ export const getEvolutionCondition = (evolutionDetails: any[]): string => {
   const conditions: string[] = [];
 
   if (detail.min_level) {
-    conditions.push(`레벨 ${detail.min_level}`);
+    conditions.push(`${t('level', language)} ${detail.min_level}`);
   }
 
   if (detail.item) {
     const itemName = detail.item.name;
-    conditions.push(STONE_NAMES[itemName] || itemName);
+    const stone = STONE_NAMES[itemName];
+    if (stone) {
+      conditions.push(stone[language] || stone.en);
+    } else {
+      conditions.push(itemName.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()));
+    }
   }
 
   if (detail.time_of_day) {
-    conditions.push(TIME_NAMES[detail.time_of_day] || detail.time_of_day);
+    const timeNames = TIME_NAMES[detail.time_of_day];
+    if (timeNames) {
+      conditions.push(timeNames[language] || timeNames.en);
+    }
   }
 
   if (detail.min_happiness) {
-    conditions.push(`친밀도 ${detail.min_happiness}+`);
+    conditions.push(`${t('friendship', language)} ${detail.min_happiness}+`);
   }
 
   if (detail.trigger?.name === 'trade') {
-    conditions.push('교환 진화');
+    conditions.push(t('trade', language));
     if (detail.held_item) {
-      conditions.push(`${detail.held_item.name} 소지`);
+      conditions.push(`+ ${detail.held_item.name}`);
     }
   }
 
   if (detail.location) {
-    conditions.push('특정 장소');
+    conditions.push(t('special_location', language));
   }
 
   if (detail.known_move) {
-    conditions.push(`${detail.known_move.name} 습득`);
+    conditions.push(`${t('learn_move', language)}: ${detail.known_move.name}`);
   }
 
   if (detail.party_species) {
-    conditions.push('파티에 특정 포켓몬');
+    conditions.push(t('party_pokemon', language));
   }
 
-  return conditions.length > 0 ? conditions.join(' • ') : '특수조건';
+  return conditions.length > 0 ? conditions.join(' • ') : t('special_condition', language);
 };
 
 export const processEvolutionChain = (chain: any): EvolutionPokemon[][] => {
@@ -116,41 +124,52 @@ export const processEvolutionChain = (chain: any): EvolutionPokemon[][] => {
     }
   };
 
-  traverse(chain, 0);
+  if (chain.chain) {
+    traverse(chain.chain, 0);
+  }
+  
   return stages;
 };
 
-export const formatEvolutionConditions = (pokemon: EvolutionPokemon): string => {
+export const formatEvolutionConditions = (pokemon: EvolutionPokemon, language: Language = 'en'): string => {
   const conditions: string[] = [];
 
   if (pokemon.minLevel) {
-    conditions.push(`레벨 ${pokemon.minLevel}`);
+    conditions.push(`${t('level', language)} ${pokemon.minLevel}`);
   }
 
   if (pokemon.item) {
-    conditions.push(STONE_NAMES[pokemon.item] || pokemon.item);
+    const stone = STONE_NAMES[pokemon.item];
+    if (stone) {
+      conditions.push(stone[language] || stone.en);
+    } else {
+      conditions.push(pokemon.item.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()));
+    }
   }
 
   if (pokemon.timeOfDay) {
-    conditions.push(TIME_NAMES[pokemon.timeOfDay] || pokemon.timeOfDay);
+    const timeNames = TIME_NAMES[pokemon.timeOfDay];
+    if (timeNames) {
+      conditions.push(timeNames[language] || timeNames.en);
+    }
   }
 
   if (pokemon.friendship) {
-    conditions.push('친밀도');
+    conditions.push(t('friendship', language));
   }
 
   if (pokemon.trade) {
-    conditions.push('교환');
+    conditions.push(t('trade', language));
   }
 
   if (pokemon.location) {
-    conditions.push('특정 장소');
+    conditions.push(t('special_location', language));
   }
 
-  return conditions.length > 0 ? conditions.join(' • ') : 'Evolution';
+  return conditions.length > 0 ? conditions.join(' • ') : t('evolution', language);
 };
 
-export const getStageLabel = (stageIndex: number, language: Language = 'ko'): string => {
+export const getStageLabel = (stageIndex: number, language: Language = 'en'): string => {
   switch (stageIndex) {
     case 0:
       return t('basic', language);

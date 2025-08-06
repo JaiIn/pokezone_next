@@ -1,4 +1,4 @@
-import { Language } from '@/contexts/LanguageContext';
+import { Language } from '../contexts/LanguageContext';
 
 interface Translations {
   [key: string]: {
@@ -18,7 +18,7 @@ const translations: Translations = {
   'weight': { en: 'Weight', ko: '몸무게', ja: '重さ' },
   'base_experience': { en: 'Base Experience', ko: '기초 경험치', ja: '基礎経験値' },
   'base_stats': { en: 'Base Stats', ko: '종족값', ja: '種族値' },
-  'total_stats': { en: 'Total Stats', ko: '종족값 합계', ja: '種족値合計' },
+  'total_stats': { en: 'Total Stats', ko: '종족값 합계', ja: '種族値合計' },
   
   'hp': { en: 'HP', ko: 'HP', ja: 'HP' },
   'attack': { en: 'Attack', ko: '공격', ja: '攻撃' },
@@ -31,7 +31,7 @@ const translations: Translations = {
   'hidden_ability': { en: 'Hidden Ability', ko: '숨겨진 특성', ja: '隠れ特性' },
   
   'evolution_chain': { en: 'Evolution Chain', ko: '진화', ja: '進化系統' },
-  'check_evolution_stages': { en: 'Check the evolution stages and conditions of Pokemon', ko: '포켓몬의 진화 단계와 조건을 확인하세요', ja: 'ポケモンの進化段階と条件を確認' },
+  'check_evolution_stages': { en: 'Check the evolution stages and conditions of Pokemon', ko: '포켓몬의 진화 단계와 조건을 확인하세요', ja: 'ポケモンの進化段階と条件を確인' },
   'level': { en: 'Level', ko: '레벨', ja: 'レベル' },
   'stage_1': { en: '1st Stage', ko: '1단계', ja: '1段階' },
   'stage_2': { en: '2nd Stage', ko: '2단계', ja: '2段階' },
@@ -39,7 +39,7 @@ const translations: Translations = {
   'basic': { en: 'Basic', ko: '기본', ja: '基本' },
   
   'learnable_moves': { en: 'Learnable Moves', ko: '배울 수 있는 기술', ja: '覚える技' },
-  'check_all_moves': { en: 'Check all moves this Pokemon can learn', ko: '이 포켓몬이 배울 수 있는 모든 기술을 확인하세요', ja: 'このポケモンが覚える全ての技を確認' },
+  'check_all_moves': { en: 'Check all moves this Pokemon can learn', ko: '이 포켓몬이 배울 수 있는 모든 기술을 확인하세요', ja: 'このポケモンが覚える全ての技を確인' },
   'level_up_moves': { en: 'Level-up Moves', ko: '레벨업 기술', ja: 'レベルアップ技' },
   'moves_learned_naturally': { en: 'Moves learned naturally through leveling up', ko: '레벨업으로 자연스럽게 배우는 기술', ja: 'レベルアップで自然に覚える技' },
   'tm_tr_moves': { en: 'TM/TR Moves', ko: 'TM/TR 기술', ja: 'TM/TR技' },
@@ -52,7 +52,7 @@ const translations: Translations = {
   'first_pokemon': { en: 'First Pokemon', ko: '첫 번째 포켓몬', ja: '1匹目のポケモン' },
   'second_pokemon': { en: 'Second Pokemon', ko: '두 번째 포켓몬', ja: '2匹目のポケモン' },
   'select_first_pokemon': { en: 'Select first Pokemon', ko: '첫 번째 포켓몬 선택', ja: '1匹目のポケモンを選択' },
-  'select_second_pokemon': { en: 'Select second Pokemon', ko: '두 번째 포켓몬 선택', ja: '2匹目のポケモンを選択' },
+  'select_second_pokemon': { en: 'Select second Pokemon', ko: '두 번째 포켓몬 선택', ja: '2匹目のポケモンを選택' },
   'select_different_pokemon': { en: 'Select Different Pokemon', ko: '다른 포켓몬 선택', ja: '別のポケモンを選択' },
   'basic_information': { en: 'Basic Information', ko: '기본 정보', ja: '基本情報' },
   'vs': { en: 'vs', ko: 'vs', ja: 'vs' },
@@ -97,7 +97,35 @@ const translations: Translations = {
   'normal': { en: 'Normal', ko: '일반', ja: '通常' },
   'shiny_pokemon': { en: 'Shiny Pokemon', ko: '색이 다른 포켓몬', ja: '色違いポケモン' },
   'normal_color': { en: 'Normal Color', ko: '일반 색상', ja: '通常色' },
-  'pokemon_forms': { en: 'Pokemon Forms', ko: '색이 다른 포켓몬', ja: 'ポケモンの姿' }
+  'pokemon_forms': { en: 'Pokemon Forms', ko: '색이 다른 포켓몬', ja: 'ポケモンの姿' },
+  
+  // 헤더 및 네비게이션
+  'pokedex': { en: 'Pokédex', ko: '포켓몬 도감', ja: 'ポケモン図鑑' },
+  'compare': { en: 'Compare', ko: '비교', ja: '比較' },
+  'favorites': { en: 'Favorites', ko: '즐겨찾기', ja: 'お気に入り' },
+  'back_to_pokedex': { en: 'Back to Pokedex', ko: '포켓몬 도감으로', ja: 'ポケモン図鑑に戻る' },
+  
+  // 고급 필터
+  'advanced_filters': { en: 'Advanced Filters', ko: '고급 필터', ja: '詳細フィルター' },
+  'clear_all': { en: 'Clear All', ko: '전체 지우기', ja: 'すべてクリア' },
+  'generation': { en: 'Generation', ko: '세대', ja: '世代' },
+  'evolution_filter': { en: 'Evolution', ko: '진화', ja: '進化' },
+  'all_pokemon': { en: 'All Pokemon', ko: '모든 포켓몬', ja: 'すべてのポケモン' },
+  'can_evolve': { en: 'Can Evolve', ko: '진화 가능', ja: '進化可能' },
+  'cannot_evolve': { en: 'Cannot Evolve', ko: '진화 불가', ja: '進化不可' },
+  'total_base_stats': { en: 'Total Base Stats', ko: '총 종족값', ja: '種族値合計' },
+  'types': { en: 'Types', ko: '타입', ja: 'タイプ' },
+  'selected': { en: 'selected', ko: '선택됨', ja: '選択済み' },
+  'search_by_name': { en: 'Search by Name', ko: '이름으로 검색', ja: '名前で検索' },
+  'enter_pokemon_name': { en: 'Enter Pokemon name...', ko: '포켓몬 이름 입력...', ja: 'ポケモン名を入力...' },
+  
+  // 진화 관련
+  'friendship': { en: 'Friendship', ko: '친밀도', ja: 'なつき度' },
+  'trade': { en: 'Trade', ko: '교환', ja: '通信交換' },
+  'special_location': { en: 'Special Location', ko: '특정 장소', ja: '特定の場所' },
+  'learn_move': { en: 'Learn Move', ko: '기술 습득', ja: '技を覚える' },
+  'party_pokemon': { en: 'Party Pokemon', ko: '파티 포켓몬', ja: 'パーティポケモン' },
+  'special_condition': { en: 'Special Condition', ko: '특수 조건', ja: '特殊条件' }
 };
 
 export function t(key: string, language: Language = 'en'): string {

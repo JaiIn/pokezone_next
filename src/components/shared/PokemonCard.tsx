@@ -5,23 +5,26 @@ import Image from 'next/image';
 import { Pokemon, PokemonSpecies, PokemonListItem } from '@/types';
 import { PokemonService } from '@/services/pokemonService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { FavoriteButton } from './FavoriteButton';
 
 interface PokemonCardProps {
   pokemon: Pokemon | PokemonListItem | any;
   species?: PokemonSpecies | null;
   onClick: () => void;
   priority?: boolean;
+  showFavorite?: boolean;
 }
 
-export function PokemonCard({ pokemon, species, onClick, priority = false }: PokemonCardProps) {
+export function PokemonCard({ pokemon, species, onClick, priority = false, showFavorite = true }: PokemonCardProps) {
   const { language } = useLanguage();
   const [pokemonData, setPokemonData] = useState<Pokemon | null>(null);
+  const [speciesData, setSpeciesData] = useState<PokemonSpecies | null>(species || null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Pokemon 객체가 완전하지 않은 경우 (PokemonListItem인 경우)
-    if (!pokemon.types && pokemon.name) {
-      const loadPokemonData = async () => {
+    const loadPokemonData = async () => {
+      // Pokemon 객체가 완전하지 않은 경우 (PokemonListItem인 경우)
+      if (!pokemon.types && pokemon.name) {
         setLoading(true);
         try {
           let pokemonId = pokemon.name;
@@ -30,25 +33,45 @@ export function PokemonCard({ pokemon, species, onClick, priority = false }: Pok
           }
           const data = await PokemonService.getPokemon(pokemonId);
           setPokemonData(data);
+          
+          // 번역을 위해 species 데이터도 로드 (언어가 영어가 아닌 경우)
+          if (language !== 'en' && !species) {
+            try {
+              const speciesResponse = await PokemonService.getPokemonSpecies(data.id);
+              setSpeciesData(speciesResponse);
+            } catch (error) {
+              console.warn('Failed to load species data for translation:', error);
+            }
+          }
         } catch (error) {
           console.error('Failed to load pokemon data:', error);
         } finally {
           setLoading(false);
         }
-      };
-      
-      loadPokemonData();
-    } else {
-      setPokemonData(pokemon);
-    }
-  }, [pokemon]);
+      } else {
+        setPokemonData(pokemon);
+        
+        // 기존 Pokemon 데이터가 있지만 번역이 필요한 경우
+        if (language !== 'en' && !species && pokemon.id) {
+          try {
+            const speciesResponse = await PokemonService.getPokemonSpecies(pokemon.id);
+            setSpeciesData(speciesResponse);
+          } catch (error) {
+            console.warn('Failed to load species data for translation:', error);
+          }
+        }
+      }
+    };
+
+    loadPokemonData();
+  }, [pokemon, language, species]);
 
   if (loading) {
     return (
       <div className="pokemon-card cursor-pointer overflow-hidden group">
         <div className="relative p-6">
           <div className="text-right text-gray-400 dark:text-slate-500 text-sm font-semibold mb-2">
-            #{pokemon.name.includes('pokemon-') ? pokemon.name.replace('pokemon-', '').padStart(3, '0') : '???'}
+            #{pokemon.name?.includes('pokemon-') ? pokemon.name.replace('pokemon-', '').padStart(3, '0') : '???'}
           </div>
           
           <div className="flex justify-center mb-4">
@@ -70,7 +93,7 @@ export function PokemonCard({ pokemon, species, onClick, priority = false }: Pok
       <div className="pokemon-card cursor-pointer overflow-hidden group" onClick={onClick}>
         <div className="relative p-6">
           <div className="text-right text-gray-400 dark:text-slate-500 text-sm font-semibold mb-2">
-            #{pokemon.name.includes('pokemon-') ? pokemon.name.replace('pokemon-', '').padStart(3, '0') : '???'}
+            #{pokemon.name?.includes('pokemon-') ? pokemon.name.replace('pokemon-', '').padStart(3, '0') : '???'}
           </div>
           
           <div className="flex justify-center mb-4">
@@ -80,23 +103,32 @@ export function PokemonCard({ pokemon, species, onClick, priority = false }: Pok
           </div>
           
           <h3 className="text-xl font-bold text-center mb-2 text-gray-800 dark:text-white capitalize">
-            {pokemon.name.replace('pokemon-', '#').replace('-', ' ')}
+            {pokemon.name?.replace('pokemon-', '#').replace('-', ' ')}
           </h3>
         </div>
       </div>
     );
   }
 
-  const displayName = species ? PokemonService.getDisplayName(pokemonData, species, language) : 
-                     pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1);
+  const displayName = PokemonService.getDisplayName(pokemonData, speciesData, language);
   const imageUrl = pokemonData.sprites?.other?.['official-artwork']?.front_default || 
                    pokemonData.sprites?.front_default;
 
   return (
     <div
-      className="pokemon-card cursor-pointer overflow-hidden group"
+      className="pokemon-card cursor-pointer overflow-hidden group relative"
       onClick={onClick}
     >
+      {/* 즐겨찾기 버튼 - 왼쪽 상단으로 이동 */}
+      {showFavorite && pokemonData && (
+        <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          <FavoriteButton 
+            pokemon={pokemonData}
+            species={speciesData}
+          />
+        </div>
+      )}
+
       <div className="relative p-6">
         <div className="text-right text-gray-400 dark:text-slate-500 text-sm font-semibold mb-2">
           #{PokemonService.formatPokemonId(pokemonData.id)}

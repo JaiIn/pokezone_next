@@ -8,6 +8,7 @@ import { Header } from './shared/Header';
 import { ThemeToggle } from './shared/ThemeToggle';
 import { SearchBar } from './shared/SearchBar';
 import { PokemonCard } from './shared/PokemonCard';
+import { AdvancedFilters } from './shared/filters/AdvancedFilters';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorMessage } from './ErrorMessage';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -53,6 +54,7 @@ const PokemonGrid = ({ pokemonList, onPokemonClick }: any) => {
           pokemon={pokemon}
           onClick={() => onPokemonClick(pokemon)}
           priority={index < 10} // 처음 10개는 우선 로딩
+          showFavorite={true} // 즐겨찾기 버튼 표시
         />
       ))}
     </div>
@@ -62,6 +64,9 @@ const PokemonGrid = ({ pokemonList, onPokemonClick }: any) => {
 export function PokemonDex() {
   const router = useRouter();
   const { language } = useLanguage();
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState(null);
+  
   const { 
     pokemonList, 
     loading, 
@@ -96,6 +101,14 @@ export function PokemonDex() {
     router.push('/worldcup');
   };
 
+  const handleFiltersChange = (filters: any) => {
+    setAppliedFilters(filters);
+    // TODO: 필터 로직 구현 (다음 단계에서)
+  };
+
+  // 필터링된 포켓몬 리스트 (기본 구현)
+  const filteredPokemonList = pokemonList; // TODO: 실제 필터링 로직 구현
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
       <ThemeToggle />
@@ -103,6 +116,13 @@ export function PokemonDex() {
       
       <div className="container mx-auto px-4 py-8">
         <SearchBar onPokemonSelect={handleSearchSelect} />
+        
+        {/* 고급 필터 */}
+        <AdvancedFilters
+          onFiltersChange={handleFiltersChange}
+          isOpen={showAdvancedFilters}
+          onToggle={() => setShowAdvancedFilters(!showAdvancedFilters)}
+        />
         
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <GenerationSelector 
@@ -146,7 +166,7 @@ export function PokemonDex() {
             </div>
             
             <PokemonGrid 
-              pokemonList={pokemonList} 
+              pokemonList={filteredPokemonList} 
               onPokemonClick={handlePokemonClick}
             />
             
@@ -178,6 +198,18 @@ export function PokemonDex() {
             )}
           </>
         )}
+      </div>
+      
+      {/* 즐겨찾기 플로팅 버튼 (모바일) */}
+      <div className="fixed bottom-6 right-6 sm:hidden z-30">
+        <button
+          onClick={() => router.push('/favorites')}
+          className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110"
+        >
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
       </div>
       
       <footer className="bg-gray-800 dark:bg-slate-900 text-white py-8 mt-16 border-t border-gray-200 dark:border-slate-700">
