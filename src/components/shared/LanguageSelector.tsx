@@ -10,7 +10,18 @@ const languages = [
 ];
 
 export function LanguageSelector() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, mounted } = useLanguage();
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center space-x-2">
+        <div className="px-3 py-2 bg-white/10 rounded-lg text-sm font-medium flex items-center space-x-1">
+          <span>🌐</span>
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   const handleLanguageChange = (newLanguage: Language) => {
     console.log('🌍 언어 변경:', language, '->', newLanguage);

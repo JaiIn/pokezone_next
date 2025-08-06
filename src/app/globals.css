@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 초기 테마 설정 (하이드레이션 오류 방지) */
+:root {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
 @layer base {
   :root {
     --color-background: 255 255 255;

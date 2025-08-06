@@ -8,6 +8,7 @@ import { Header } from './shared/Header';
 import { ThemeToggle } from './shared/ThemeToggle';
 import { SearchBar } from './shared/SearchBar';
 import { PokemonCard } from './shared/PokemonCard';
+import { PokemonModal } from './shared/modal/PokemonModal';
 import { AdvancedFilters } from './shared/filters/AdvancedFilters';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorMessage } from './ErrorMessage';
@@ -67,6 +68,10 @@ export function PokemonDex() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState(null);
   
+  // 모달 상태
+  const [selectedPokemonId, setSelectedPokemonId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const { 
     pokemonList, 
     loading, 
@@ -77,8 +82,6 @@ export function PokemonDex() {
     changeGeneration,
     reset 
   } = usePokemonList(20);
-  
-  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
   const handlePokemonClick = (pokemon: Pokemon) => {
     // Pokemon ID 추출 (pokemon-1 -> 1)
@@ -86,11 +89,23 @@ export function PokemonDex() {
       ? pokemon.name.replace('pokemon-', '')
       : pokemon.name;
     
-    router.push(`/pokemon/${pokemonId}`);
+    setSelectedPokemonId(pokemonId);
+    setIsModalOpen(true);
   };
 
   const handleSearchSelect = (pokemonId: number) => {
-    router.push(`/pokemon/${pokemonId}`);
+    setSelectedPokemonId(pokemonId.toString());
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedPokemonId(null);
+  };
+
+  const handlePokemonNavigate = (pokemonId: string) => {
+    setSelectedPokemonId(pokemonId);
+    // 모달은 그대로 유지하고 새 포켓몬 데이터만 로드
   };
 
   const handleCompareClick = () => {
@@ -199,6 +214,14 @@ export function PokemonDex() {
           </>
         )}
       </div>
+      
+      {/* 포켓몬 모달 */}
+      <PokemonModal
+        pokemonId={selectedPokemonId}
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onPokemonNavigate={handlePokemonNavigate}
+      />
       
       {/* 즐겨찾기 플로팅 버튼 (모바일) */}
       <div className="fixed bottom-6 right-6 sm:hidden z-30">

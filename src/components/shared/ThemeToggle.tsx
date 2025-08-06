@@ -4,7 +4,15 @@ import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, mounted } = useTheme();
+
+  if (!mounted) {
+    return (
+      <div className="fixed top-4 right-4 z-40 p-3 rounded-full bg-white dark:bg-slate-700 shadow-lg border border-gray-200 dark:border-slate-600">
+        <div className="w-5 h-5 bg-gray-300 dark:bg-slate-500 rounded animate-pulse"></div>
+      </div>
+    );
+  }
 
   return (
     <button

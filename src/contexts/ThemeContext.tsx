@@ -7,6 +7,7 @@ type Theme = 'light' | 'dark';
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -18,39 +19,39 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
     
-    // 로컬 스토리지에서 테마 설정 불러오기
+    // 저장된 테마 또는 시스템 선호도 확인
     const savedTheme = localStorage.getItem('pokezone-theme') as Theme;
-    if (savedTheme) {
+    if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
       setTheme(savedTheme);
-    } else {
-      // 시스템 테마 감지
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setTheme('dark');
-      }
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
     }
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('pokezone-theme', newTheme);
-  };
-
   useEffect(() => {
     if (mounted) {
-      // HTML 요소에 테마 클래스 적용
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(theme);
+      // DOM에 테마 클래스 적용
+      const root = window.document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(theme);
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('pokezone-theme', theme);
     }
   }, [theme, mounted]);
 
-  // 마운트되기 전에는 기본 테마로 렌더링
-  if (!mounted) {
-    return <div className="min-h-screen">{children}</div>;
-  }
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  const value = {
+    theme,
+    toggleTheme,
+    mounted
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
