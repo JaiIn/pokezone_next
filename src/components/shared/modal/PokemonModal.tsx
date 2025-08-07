@@ -259,32 +259,154 @@ export function PokemonModal({ pokemonId, isOpen, onClose, onPokemonNavigate }: 
             </div>
             
             {/* 탭 콘텐츠 */}
-            <div className="min-h-[400px]">
+            <div className="min-h-[500px]">
               {activeTab === 'info' && (
-                <div className="space-y-8">
-                  {/* 레이더 차트 */}
-                  <div className="flex justify-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* 왼쪽: 종족값 차트 */}
+                  <div className="flex flex-col items-center justify-center">
+                    <h3 className="text-xl font-semibold mb-6 text-gray-800 dark:text-white">
+                      {t('base_stats', language)}
+                    </h3>
                     <StatsRadarChart pokemon={pokemon} />
                   </div>
                   
-                  {/* 특성 */}
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                      {t('abilities', language)}
-                    </h3>
-                    <div className="space-y-2">
-                      {pokemon.abilities.map((ability) => (
-                        <div key={ability.ability.name} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                          <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium">
-                            {PokemonService.formatAbilityName(ability.ability.name)}
-                          </span>
-                          {ability.is_hidden && (
-                            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-100 dark:bg-amber-900 px-2 py-1 rounded">
-                              {t('hidden_ability', language)}
+                  {/* 오른쪽: 상세 정보 */}
+                  <div className="space-y-6">
+                    {/* 종족값 상세 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
+                        <span className="mr-2">📊</span>
+                        {t('detailed_stats', language)}
+                      </h3>
+                      <div className="space-y-3">
+                        {pokemon.stats.map((stat, index) => {
+                          const maxStat = 255;
+                          const percentage = (stat.base_stat / maxStat) * 100;
+                          const statColors = [
+                            'bg-red-500', 'bg-orange-500', 'bg-yellow-500', 
+                            'bg-blue-500', 'bg-green-500', 'bg-purple-500'
+                          ];
+                          
+                          return (
+                            <div key={stat.stat.name} className="relative">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                                  {PokemonService.formatStatName(stat.stat.name, language)}
+                                </span>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-bold text-gray-900 dark:text-white">
+                                    {stat.base_stat}
+                                  </span>
+                                  <div className={`px-2 py-1 rounded text-xs font-medium text-white ${
+                                    stat.base_stat >= 120 ? 'bg-green-500' :
+                                    stat.base_stat >= 90 ? 'bg-yellow-500' :
+                                    stat.base_stat >= 70 ? 'bg-orange-500' : 'bg-red-500'
+                                  }`}>
+                                    {stat.base_stat >= 120 ? 'S' :
+                                     stat.base_stat >= 90 ? 'A' :
+                                     stat.base_stat >= 70 ? 'B' : 'C'}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="bg-gray-200 dark:bg-slate-600 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full transition-all duration-700 ${statColors[index]}`}
+                                  style={{ width: `${Math.min(percentage, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                        
+                        {/* 총 종족값 */}
+                        <div className="pt-3 border-t border-gray-200 dark:border-slate-700">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-bold text-gray-800 dark:text-white">
+                              {t('total_stats', language)}
                             </span>
-                          )}
+                            <div className="flex items-center space-x-2">
+                              <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                {pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0)}
+                              </span>
+                              <div className={`px-2 py-1 rounded text-xs font-medium text-white ${
+                                pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0) >= 600 ? 'bg-purple-500' :
+                                pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0) >= 500 ? 'bg-blue-500' :
+                                pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0) >= 400 ? 'bg-green-500' : 'bg-yellow-500'
+                              }`}>
+                                {pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0) >= 600 ? 'Legendary' :
+                                 pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0) >= 500 ? 'Elite' :
+                                 pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0) >= 400 ? 'Strong' : 'Normal'}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      ))}
+                      </div>
+                    </div>
+                    
+                    {/* 특성 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
+                        <span className="mr-2">⚡</span>
+                        {t('abilities', language)}
+                      </h3>
+                      <div className="space-y-3">
+                        {pokemon.abilities.map((ability, index) => (
+                          <div key={ability.ability.name} className="relative group">
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                                  ability.is_hidden ? 'bg-amber-500' : 'bg-blue-500'
+                                }`}>
+                                  {index + 1}
+                                </div>
+                                <span className="font-medium text-gray-900 dark:text-white">
+                                  {PokemonService.formatAbilityName(ability.ability.name)}
+                                </span>
+                              </div>
+                              {ability.is_hidden && (
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-100 dark:bg-amber-900 px-2 py-1 rounded">
+                                    {t('hidden_ability', language)}
+                                  </span>
+                                  <span className="text-amber-500">🔒</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* 물리적 특성 */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
+                        <span className="mr-2">📏</span>
+                        {t('physical_characteristics', language)}
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+                          <div className="text-center">
+                            <div className="text-2xl mb-2">📏</div>
+                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                              {(pokemon.height / 10).toFixed(1)}m
+                            </div>
+                            <div className="text-sm text-blue-700 dark:text-blue-300">
+                              {t('height', language)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg">
+                          <div className="text-center">
+                            <div className="text-2xl mb-2">⚖️</div>
+                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                              {(pokemon.weight / 10).toFixed(1)}kg
+                            </div>
+                            <div className="text-sm text-green-700 dark:text-green-300">
+                              {t('weight', language)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

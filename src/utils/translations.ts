@@ -125,7 +125,11 @@ const translations: Translations = {
   'special_location': { en: 'Special Location', ko: '특정 장소', ja: '特定の場所' },
   'learn_move': { en: 'Learn Move', ko: '기술 습득', ja: '技を覚える' },
   'party_pokemon': { en: 'Party Pokemon', ko: '파티 포켓몬', ja: 'パーティポケモン' },
-  'special_condition': { en: 'Special Condition', ko: '특수 조건', ja: '特殊条件' }
+  'special_condition': { en: 'Special Condition', ko: '특수 조건', ja: '特殊条件' },
+  
+  // 모달 상세 정보
+  'detailed_stats': { en: 'Detailed Stats', ko: '상세 능력치', ja: '詳細ステータス' },
+  'physical_characteristics': { en: 'Physical Characteristics', ko: '신체 특성', ja: '身体的特徴' }
 };
 
 export function t(key: string, language: Language = 'en'): string {
